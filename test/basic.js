@@ -1,5 +1,6 @@
-var levelup = require('level');
-var db = levelup('./test/db');
+var levelup = require('levelup');
+var leveldown = require('leveldown')
+var db = levelup(leveldown('./test/db'));
 
 require('../')(db);
 
@@ -78,7 +79,7 @@ test('changeUsername', function(t) {
         db.accounts.signin('not_alex', '$ecret', function (error) {
             t.equal(error, null);
         });
-        
+
         db.accounts.signin('alex', '$ecret', function (error) {
             t.notEqual(error, null);
         });
@@ -93,7 +94,7 @@ test('changePassword', function(t) {
         db.accounts.signin('not_alex', 'geheim', function (error) {
             t.equal(error, null);
         });
-        
+
         db.accounts.signin('not_alex', '$ecret', function (error) {
             t.notEqual(error, null);
         });

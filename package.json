@@ -10,8 +10,9 @@
   "author": "Alexander Gugel <alexander.gugel@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "level": "^0.18.0",
-    "tape": "^3.4.0"
+    "tape": "^3.4.0",
+    "leveldown": "^5.1.1",
+    "levelup": "^4.1.0"
   },
   "dependencies": {
     "bcryptjs": "^2.1.0",
