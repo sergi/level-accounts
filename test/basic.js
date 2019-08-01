@@ -1,6 +1,6 @@
 var levelup = require("levelup");
 var leveldown = require("leveldown");
-var encode = require('encoding-down')
+var encode = require("encoding-down");
 var db = levelup(encode(leveldown("./test/db")));
 
 require("../")(db);
@@ -49,65 +49,85 @@ test("valid signin", async function(t) {
   delete user.token;
   t.deepEqual(user, { id: id, username: "alex" });
 });
-/*
-test("invalid signin", function(t) {
+
+test("invalid signin", async function(t) {
   t.plan(2);
-  db.accounts.signin("alex", "$nvalid", function(error, user) {
+  let user;
+  try {
+    user = await db.accounts.signin("alex", "$nvalid");
+  } catch (error) {
     t.notEqual(error, null);
-    t.equal(user, undefined);
-  });
+  }
+  t.equal(user, undefined);
 });
 
-test("valid auth", function(t) {
-  t.plan(2);
-  db.accounts.auth(token, function(error, user) {
-    t.equal(error, null);
-    t.deepEqual(user, { id: id, username: "alex", token: token });
-  });
+test("valid auth", async function(t) {
+  t.plan(1);
+  let user;
+  try {
+    user = await db.accounts.auth(token);
+  } catch (error) {
+    t.fail(error);
+  }
+  t.deepEqual(user, { id: id, username: "alex", token: token });
 });
 
-test("invalid auth", function(t) {
+test("invalid auth", async function(t) {
   t.plan(2);
-  db.accounts.auth("invalid token", function(error, user) {
+  let user;
+  try {
+    user = await db.accounts.auth("invalid token");
+  } catch (error) {
     t.notEqual(error, null);
-    t.equal(user, undefined);
-  });
+  }
+  t.equal(user, undefined);
 });
 
-test("changeUsername", function(t) {
-  t.plan(4);
-  db.accounts.changeUsername(id, "not_alex", function(error, newUser) {
-    t.equal(error, null);
+test("changeUsername", async function(t) {
+  t.plan(2);
+  let newUser;
+  try {
+    newUser = await db.accounts.changeUsername(id, "not_alex");
+  } catch (error) {
+    t.fail(error);
+  }
 
-    t.deepEqual(newUser, {
-      id: id,
-      newUsername: "not_alex",
-      oldUsername: "alex",
-      username: "not_alex"
-    });
-
-    db.accounts.signin("not_alex", "$ecret", function(error) {
-      t.equal(error, null);
-    });
-
-    db.accounts.signin("alex", "$ecret", function(error) {
-      t.notEqual(error, null);
-    });
+  t.deepEqual(newUser, {
+    id: id,
+    newUsername: "not_alex",
+    oldUsername: "alex",
+    username: "not_alex"
   });
+
+  try {
+    await db.accounts.signin("not_alex", "$ecret");
+  } catch (error) {
+    t.fail(error);
+  }
+
+  try {
+    await db.accounts.signin("alex", "$ecret");
+  } catch (error) {
+    t.ok(error);
+  }
 });
 
-test("changePassword", function(t) {
-  t.plan(3);
-  db.accounts.changePassword(id, "geheim", function(error) {
-    t.equal(error, null);
+test("changePassword", async function(t) {
+  t.plan(1);
+  try {
+    await db.accounts.changePassword(id, "geheim");
+  } catch (error) {
+    t.fail(error);
+  }
+  try {
+    await db.accounts.signin("not_alex", "geheim");
+  } catch (error) {
+    t.fail(error);
+  }
 
-    db.accounts.signin("not_alex", "geheim", function(error) {
-      t.equal(error, null);
-    });
-
-    db.accounts.signin("not_alex", "$ecret", function(error) {
-      t.notEqual(error, null);
-    });
-  });
+  try {
+    await db.accounts.signin("not_alex", "$ecret");
+  } catch (error) {
+    t.ok(error);
+  }
 });
-*/
